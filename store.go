@@ -1,31 +1,114 @@
 package main
 
-import (
-	
-)
+import "errors"
 
-var IdCounter int = 1
+var UserNotFound = errors.New("User not found")
+var TaskNotFound = errors.New("Task not found")
 
 type Store struct {
-	Users [int]
-	User{}
-	Tasks []Task
+	UserMap    map[uint64]User
+	TaskMap    map[uint64]Task
+	nextUserId uint64
+	nextTaskId uint64
 }
 
 func NewStore() *Store {
 	return &Store{
-		Users: []User{},
-		Tasks: []Task{},
+		UserMap:    make(map[uint64]User),
+		TaskMap:    make(map[uint64]Task),
+		nextUserId: 1,
+		nextTaskId: 1,
 	}
 }
 
+// User CRUD operations
 func (s *Store) AddUser(user User) {
-	user.Id = IdCounter
-	IdCounter++
-	s.Users = append(s.Users, user)
+	user.Id = s.nextUserId
+	s.nextUserId++
+	s.UserMap[user.Id] = user
+}
+func (s *Store) UpdateUser(id uint64, updatedUser User) error {
+	if _, ok := s.UserMap[id]; ok {
+		updatedUser.Id = id
+		s.UserMap[id] = updatedUser
+		return nil
+	}
+	return UserNotFound
+}
+func (s *Store) DeleteUser(id uint64) error {
+	if _, ok := s.UserMap[id]; ok {
+		delete(s.UserMap, id)
+		return nil
+	}
+	return UserNotFound
+}
+func (s *Store) GetUser(id uint64) (User, error) {
+	if user, ok := s.UserMap[id]; ok {
+		return user, nil
+	}
+	return User{}, UserNotFound
+}
+func (s *Store) GetAllUsers() []User {
+	users := make([]User, 0, len(s.UserMap))
+	for _, user := range s.UserMap {
+		users = append(users, user)
+	}
+	return users
 }
 
-func (s *Store) UpdateUser(id int, updatedUser User) {
-	if 
+//Task CRUD operations
 
+func (s *Store) AddTask(t Task, userId uint64) error {
 
+	t.Id = s.nextTaskId
+	t.UserId = userId
+	s.nextTaskId++
+	s.TaskMap[t.Id] = t
+
+	var u User = s.UserMap[userId]
+	if u.Id == 0 {
+		return UserNotFound
+	}
+
+	u.TaskIds = append(u.TaskIds, t.Id)
+	s.UserMap[u.Id] = u
+
+	return nil
+}
+func (s *Store) UpdateTask(id uint64, updatedTask Task) error {
+	if _, ok := s.TaskMap[id]; ok {
+		updatedTask.Id = id
+		s.TaskMap[id] = updatedTask
+		return nil
+	}
+	return TaskNotFound
+}
+func (s *Store) DeleteTask(id uint64) error {
+	if _, ok := s.TaskMap[id]; ok {
+		delete(s.TaskMap, id)
+		return nil
+	}
+	return TaskNotFound
+}
+func (s *Store) GetTask(id uint64) (Task, error) {
+	if task, ok := s.TaskMap[id]; ok {
+		return task, nil
+	}
+	return Task{}, TaskNotFound
+}
+
+// search user by taskId
+func (s *Store) GetUserByTaskId(taskId uint64) (User, error) {
+	if _, ok := s.TaskMap[taskId]; !ok {
+		return User{}, TaskNotFound
+	}
+
+	for _, user := range s.UserMap {
+		for _, tId := range user.TaskIds {
+			if tId == taskId {
+				return user, nil
+			}
+		}
+	}
+	return User{}, UserNotFound
+}
