@@ -1,6 +1,9 @@
 package main
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
 
 var UserNotFound = errors.New("User not found")
 var TaskNotFound = errors.New("Task not found")
@@ -19,6 +22,27 @@ func NewStore() *Store {
 		nextUserId: 1,
 		nextTaskId: 1,
 	}
+}
+
+//creating objects, this doesnt add them to the store, just creates them, you have to add them to the store with the add functions
+
+func CreateUser(username string, password string) User {
+	user := User{
+		Username:  username,
+		Password:  password,
+		CreatedAt: time.Now(),
+	}
+	return user
+}
+func CreateTask(title string, description string, dueDate time.Time, userId uint64) Task {
+	task := Task{
+		Title:       title,
+		Description: description,
+		DueDate:     dueDate,
+		UserId:      userId,
+		CreatedAt:   time.Now(),
+	}
+	return task
 }
 
 // User CRUD operations
