@@ -120,6 +120,15 @@ func (s *Store) GetTask(id uint64) (Task, error) {
 	}
 	return Task{}, TaskNotFound
 }
+func (s *Store) GetAllTasks(uId uint64) []Task {
+	tasks := make([]Task, 0)
+	for _, task := range s.TaskMap {
+		if task.UserId == uId {
+			tasks = append(tasks, task)
+		}
+	}
+	return tasks
+}
 
 // search user by taskId
 func (s *Store) GetUserByTaskId(taskId uint64) (User, error) {
