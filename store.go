@@ -148,3 +148,11 @@ func (s *Store) GetUserByTaskId(taskId uint64) (User, error) {
 	}
 	return User{}, UserNotFound
 }
+func (s *Store) GetUserByUsername(username string) (User, error) {
+	for _, user := range s.UserMap {
+		if user.Username == username {
+			return user, nil
+		}
+	}
+	return User{}, UserNotFound
+}

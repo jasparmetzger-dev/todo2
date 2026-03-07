@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -43,12 +44,18 @@ func Register(s *Store) gin.HandlerFunc {
 				return
 			}
 		}
-		//create user and generate token
+		//create user
 		user := CreateUser(body.Username, body.Password)
-
 		s.AddUser(user)
-		token, err := generateJWT(user.Id)
+		userFromStore, err := s.GetUserByUsername(body.Username)
+		if err != nil || userFromStore.Id == 0 {
+			c.JSON(500, gin.H{"error": "user creation failed"})
+			return
+		}
+		fmt.Printf("user created: %v\n", userFromStore)
 
+		//generate token
+		token, err := generateJWT(userFromStore.Id)
 		if err != nil {
 			c.JSON(500, gin.H{"error": "token error"})
 			return
