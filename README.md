@@ -23,6 +23,7 @@ A simple RESTful API for managing todos built with Go and the Gin framework. Thi
 - **Not Scalable**: In-memory store isn't suitable for production or multi-user loads.
 - **Basic Logging**: Limited logging and monitoring features.
 - **No Database**: Lacks advanced querying and data integrity.
+- **No Hashing**: No password security.
 
 ## Tools Used
 
