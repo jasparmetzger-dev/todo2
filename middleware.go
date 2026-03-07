@@ -50,3 +50,14 @@ func AuthMiddleware(store *Store) gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func LoggingMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Log the request method and path
+		// Note: No real Logging
+		//Missing: log to a file, log level, log format, time to complete, etc.
+
+		fmt.Printf("Request: %s %s\n", c.Request.Method, c.Request.URL.Path)
+		c.Next()
+	}
+}

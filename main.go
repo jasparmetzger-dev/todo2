@@ -18,16 +18,18 @@ func main() {
 		})
 	})
 
-	//auth logic
+	//auth endpoints
 	auth := r.Group("/auth")
+	auth.Use(LoggingMiddleware())
 	{
 		auth.POST("/login", Login(store))
 		auth.POST("/register", Register(store))
 	}
 
-	//protected logic
+	//protected endpoints
+
 	api := r.Group("/api")
-	api.Use(AuthMiddleware(store)) // apply the auth middleware to all /api routes
+	api.Use(AuthMiddleware(store), LoggingMiddleware())
 	{
 		// example protected route
 		api.GET("/profile", Profile(store))

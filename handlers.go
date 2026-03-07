@@ -125,10 +125,10 @@ func UpdateTodo(s *Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//validate input
 		var body struct {
-			Title       string    `json:"title"`
-			Description string    `json:"description"`
-			Completed   bool      `json:"completed"`
-			DueDate     time.Time `json:"due_date"`
+			Title       string `json:"title"`
+			Description string `json:"description"`
+			Completed   bool   `json:"completed"`
+			DueDate     string `json:"due_date"`
 		}
 		if err := c.BindJSON(&body); err != nil {
 			c.JSON(400, gin.H{"error": "invalid input"})
@@ -152,9 +152,15 @@ func UpdateTodo(s *Store) gin.HandlerFunc {
 		if body.Completed != false && task.Completed != body.Completed {
 			task.Completed = body.Completed
 		}
-		if !body.DueDate.IsZero() {
-			task.DueDate = body.DueDate
+		if body.DueDate != "" {
+			dueDate, err := time.Parse(time.RFC3339, body.DueDate)
+			if err != nil {
+				c.JSON(400, gin.H{"error": "invalid due date format", "message": "a due date in the RFC3339 format is required"})
+				return
+			}
+			task.DueDate = dueDate
 		}
+
 		err = s.UpdateTask(task.Id, task)
 		if err != nil {
 			c.JSON(500, gin.H{"error": "failed to update task"})
