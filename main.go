@@ -27,7 +27,7 @@ func main() {
 
 	//protected logic
 	api := r.Group("/api")
-	api.Use(AuthMiddleware()) // apply the auth middleware to all /api routes
+	api.Use(AuthMiddleware(store)) // apply the auth middleware to all /api routes
 	{
 		// example protected route
 		api.GET("/profile", Profile(store))

@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -85,6 +86,8 @@ func (s *Store) GetAllUsers() []User {
 func (s *Store) AddTask(t Task, userId uint64) error {
 
 	t.Id = s.nextTaskId
+	fmt.Println("looking for userId:", userId)
+	fmt.Println("userMap:", s.UserMap)
 	t.UserId = userId
 	s.nextTaskId++
 	s.TaskMap[t.Id] = t
